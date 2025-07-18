@@ -7,10 +7,11 @@
   <!-- look‑n‑feel -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- PyScript runtime -->
-  <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+  <!-- PyScript runtime (CSS + JS) -->
+  <link rel="stylesheet" href="https://pyscript.net/releases/2023.11.1/pyscript.css" />
+  <script defer src="https://pyscript.net/releases/2023.11.1/pyscript.js"></script>
 
-  <!-- PyScript config: list extra packages & fetch the Python module -->
+  <!-- PyScript config -->
   <py-config>
     packages = ["beautifulsoup4", "openpyxl", "pandas"]
     [[fetch]]
@@ -26,7 +27,7 @@
   <button id="convert-btn">Convert&nbsp;⇨</button>
   <a id="download-link" style="display:none"></a>
 
-  <!-- tiny PyScript controller -->
+  <!-- controller -->
   <py-script>
 import js, base64, traceback
 from pyodide.ffi import create_proxy
@@ -44,13 +45,13 @@ async def convert(evt):
     try:
         fobj = file_el.files[0]
         html = await fobj.text()
-        xls  = linkedin_html_to_excel(html)      # auto‑detect posts vs comments
+        xls  = linkedin_html_to_excel(html)
         b64  = base64.b64encode(xls).decode()
 
-        dl_link.href        = ("data:application/vnd.openxmlformats-officedocument."
-                               "spreadsheetml.sheet;base64," + b64)
-        dl_link.download    = fobj.name.replace(".html", ".xlsx")
-        dl_link.textContent = "Download “" + dl_link.download + "”"
+        dl_link.href     = ("data:application/vnd.openxmlformats-officedocument."
+                            "spreadsheetml.sheet;base64," + b64)
+        dl_link.download = fobj.name.replace(".html", ".xlsx")
+        dl_link.textContent = "Download “" + dl_link.download + "”"
         dl_link.style.display = "inline"
     except Exception as e:
         js.console.error("Conversion failed:", traceback.format_exc())
