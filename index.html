@@ -24,13 +24,15 @@
   <p>Choose a saved LinkedIn <em>.html</em> activity page (posts or comments):</p>
 
   <input type="file" id="file-input" accept=".html" />
-  <button id="convert-btn">Convert ⇨</button>
-  <a id="download-link" style="display:none"></a>
+<button id="convert-btn">Convert ⇨</button>
 
-  <!-- loading indicator -->
-<span id="loader" style="display:none;margin-left:8px">
-  ⏳ Processing…
-</span>
+<!-- output area: shows either the spinner or the download link -->
+<div id="output-area" style="margin-top:1rem">
+  <span id="loader" style="display:none">
+    ⏳ Processing…
+  </span>
+  <a id="download-link" style="display:none"></a>
+</div>
 
 <!-- ──────────────────────────────────────────────────────────────── -->
 <!--  FULL SCRAPER MODULE – becomes importable as `scraper`          -->
