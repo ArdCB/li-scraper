@@ -302,11 +302,11 @@ from datetime import datetime
 from pyodide.ffi import create_proxy
 from scraper import linkedin_html_to_excel, detect_mode
 
-loader_el  = js.document.getElementById("loader")
-  
+# DOM elements
 file_el     = js.document.getElementById("file-input")
 convert_btn = js.document.getElementById("convert-btn")
 dl_link     = js.document.getElementById("download-link")
+loader_el   = js.document.getElementById("loader")   # spinner
 
 convert_btn.disabled = True
 def _on_select(evt=None):
@@ -318,19 +318,27 @@ async def convert(evt=None):
         if file_el.files.length == 0:
             return
 
-        loader_el.style.display = "inline"      # ← SHOW spinner
-        dl_link.style.display   = "none"        # hide old link
-        convert_btn.disabled    = True          # prevent double‑click
+        # show spinner & block double‑click
+        loader_el.style.display = "inline"
+        dl_link.style.display   = "none"
+        convert_btn.disabled    = True
 
+        # read HTML
         fobj      = file_el.files.item(0)
         html_text = await fobj.text()
 
-        # run scraper (this is the slow part)
+        # run scraper (slow part)
         xls_bytes = linkedin_html_to_excel(html_text)
         b64       = base64.b64encode(xls_bytes).decode()
 
-        # build filename … (unchanged code)
+        # build friendly filename
+        mode      = detect_mode(html_text)                 # posts / comments
+        ts        = datetime.now().strftime("%Y%m%d_%H%M%S")
+        m         = re.search(r"Activity\s*_?\s*(.*?)\s*_?\s*LinkedIn", fobj.name, re.I)
+        person    = m.group(1).strip().replace(" ", "_") if m else "output"
+        fname     = f"social_{mode}_{ts}_{person}.xlsx"
 
+        # expose download link
         dl_link.href          = ("data:application/vnd.openxmlformats-"
                                  "officedocument.spreadsheetml.sheet;base64," + b64)
         dl_link.download      = fname
@@ -340,8 +348,8 @@ async def convert(evt=None):
     except Exception:
         js.console.error("Conversion failed:", traceback.format_exc())
     finally:
-        loader_el.style.display = "none"        # ← HIDE spinner
-        convert_btn.disabled    = False         # re‑enable button
+        loader_el.style.display = "none"   # hide spinner
+        convert_btn.disabled    = False    # re‑enable button
 
 convert_btn.onclick = create_proxy(convert)
 </py-script>
