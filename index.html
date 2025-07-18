@@ -28,7 +28,7 @@
   <a id="download-link" style="display:none"></a>
 
   <!-- controller -->
-  <py-script>
+<py-script>
 import js, base64, traceback
 from pyodide.ffi import create_proxy
 from social_html_scraper import linkedin_html_to_excel
@@ -38,25 +38,28 @@ convert_btn = js.document.getElementById("convert-btn")
 dl_link     = js.document.getElementById("download-link")
 
 def _on_select(evt):
-    convert_btn.disabled = False
+    convert_btn.disabled = (file_el.files.length == 0)
 file_el.onchange = create_proxy(_on_select)
 
 async def convert(evt):
     try:
-        fobj = file_el.files[0]
+        if file_el.files.length == 0:
+            return
+        fobj = file_el.files.item(0)       # <-- fixed line
         html = await fobj.text()
-        xls  = linkedin_html_to_excel(html)
+
+        xls  = linkedin_html_to_excel(html)   # run scraper
         b64  = base64.b64encode(xls).decode()
 
-        dl_link.href     = ("data:application/vnd.openxmlformats-officedocument."
-                            "spreadsheetml.sheet;base64," + b64)
+        dl_link.href     = ("data:application/vnd.openxmlformats-"
+                            "officedocument.spreadsheetml.sheet;base64," + b64)
         dl_link.download = fobj.name.replace(".html", ".xlsx")
-        dl_link.textContent = "Download “" + dl_link.download + "”"
+        dl_link.textContent = f"Download “{dl_link.download}”"
         dl_link.style.display = "inline"
     except Exception as e:
         js.console.error("Conversion failed:", traceback.format_exc())
         dl_link.style.display = "none"
 convert_btn.onclick = create_proxy(convert)
-  </py-script>
+</py-script>
 </body>
 </html>
