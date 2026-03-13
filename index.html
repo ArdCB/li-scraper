@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>LinkedIn Activity → Excel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LinkedIn Activity → Excel</title>
 
-  <!-- basic styling (optional external file) -->
   <link rel="stylesheet" href="style.css" />
 
   <!-- PyScript runtime -->
@@ -20,19 +20,36 @@
 </head>
 
 <body>
-  <h1>LinkedIn Activity → Excel</h1>
-  <p>Choose a saved LinkedIn <em>.html</em> activity page (posts or comments):</p>
+  <main class="app-shell">
+    <section class="card" aria-labelledby="app-title">
+      <div class="hero">
+        <p class="eyebrow">LinkedIn Utilities</p>
+        <h1 id="app-title">LinkedIn Activity → Excel</h1>
+        <p class="lead">Convert a saved LinkedIn activity <em>.html</em> file (posts or comments) into an Excel sheet directly in your browser.</p>
+      </div>
 
-  <input type="file" id="file-input" accept=".html" />
-<button id="convert-btn">Convert ⇨</button>
+      <div class="uploader" role="group" aria-label="File conversion controls">
+        <label for="file-input" class="input-label">Upload activity HTML</label>
+        <p class="input-helper">Supports exported LinkedIn activity pages for posts and comments.</p>
+        <input type="file" id="file-input" accept=".html" />
+        <button id="convert-btn">Convert to Excel</button>
+      </div>
 
-<!-- output area: shows either the spinner or the download link -->
-<div id="output-area" style="margin-top:1rem">
-  <span id="loader" style="display:none">
-    ⏳ Processing…
-  </span>
-  <a id="download-link" style="display:none"></a>
-</div>
+      <div id="output-area" class="output-area" aria-live="polite">
+        <span id="loader" class="loader" style="display:none">
+          <span class="spinner" aria-hidden="true"></span>
+          Processing your file...
+        </span>
+        <a id="download-link" style="display:none"></a>
+      </div>
+
+      <div class="feature-grid" aria-label="App benefits">
+        <article class="feature-item">Runs fully client-side with PyScript.</article>
+        <article class="feature-item">Your file stays on your machine.</article>
+        <article class="feature-item">No backend or API keys required.</article>
+      </div>
+    </section>
+  </main>
 
 <!-- ──────────────────────────────────────────────────────────────── -->
 <!--  FULL SCRAPER MODULE – becomes importable as `scraper`          -->
@@ -321,7 +338,7 @@ async def convert(evt=None):
             return
 
         # show spinner & block double‑click
-        loader_el.style.display = "inline"
+        loader_el.style.display = "inline-flex"
         dl_link.style.display   = "none"
         convert_btn.disabled    = True
 
@@ -344,8 +361,8 @@ async def convert(evt=None):
         dl_link.href          = ("data:application/vnd.openxmlformats-"
                                  "officedocument.spreadsheetml.sheet;base64," + b64)
         dl_link.download      = fname
-        dl_link.textContent   = f"Download “{fname}”"
-        dl_link.style.display = "inline"
+        dl_link.textContent   = f"Download “{fname}”"
+        dl_link.style.display = "inline-flex"
 
     except Exception:
         js.console.error("Conversion failed:", traceback.format_exc())
